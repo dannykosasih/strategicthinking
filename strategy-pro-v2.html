@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Studio Perumusan Strategi Pro — DDK</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<style>
+:root{--navy:#0C4F8E;--teal:#15A89C;--amber:#F0A202;--primary:#0F5FA8;--blue:#1C6FB8;--soft:#6FA3D9;--mid:#B8C7D9;--light:#F4F7FB;--good:#1a7f4b;--err:#b00020}
+*{box-sizing:border-box}body{margin:0;font-family:'Open Sans',Calibri,sans-serif;background:var(--light);color:#1c2733}
+h1,h2,h3{font-family:Poppins,sans-serif}
+#loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--light);z-index:50}
+.spin{width:38px;height:38px;border:4px solid var(--mid);border-top-color:var(--navy);border-radius:50%;animation:r .8s linear infinite}@keyframes r{to{transform:rotate(360deg)}}
+.app{display:flex;min-height:100vh}
+.rail{width:250px;flex-shrink:0;background:#fff;border-right:1px solid var(--mid);display:flex;flex-direction:column}
+.railhead{padding:16px;background:var(--navy);color:#fff}
+.brandtag{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--amber)}
+.railhead h1{font-size:16px;margin:6px 0 2px;line-height:1.2}.railhead p{font-size:12px;margin:0;color:#bcd6ef}
+.navbtn{width:100%;text-align:left;padding:11px 16px;display:flex;align-items:center;gap:9px;border:none;background:transparent;cursor:pointer;border-left:3px solid transparent;font-size:14px;color:var(--navy)}
+.navbtn.active{background:var(--light);border-left-color:var(--teal);font-weight:600}
+.dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;background:var(--mid)}.dot.done{background:var(--good)}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{background:#fff;border-bottom:1px solid var(--mid);padding:10px 18px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.warnbar{padding:6px 18px;font-size:12px;background:#fff8ec;color:#8a5a18;border-bottom:1px solid var(--mid)}
+.content{flex:1;display:flex;min-height:0}.scroll{flex:1;overflow-y:auto;padding:18px;min-width:0}
+.card{background:#fff;border:1px solid var(--mid);border-radius:12px;margin-bottom:18px}
+.cardhead{padding:14px 18px 6px}.cardhead h3{font-size:16px;margin:0;color:var(--navy)}.cardhead p{font-size:12px;margin:2px 0 0;color:var(--blue)}
+.cardbody{padding:0 18px 18px}
+label.fld{display:block;margin-bottom:12px}label.fld span{display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--navy)}
+input,textarea,select{width:100%;border:1px solid var(--mid);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--soft)}
+.row{display:flex;gap:8px;margin-bottom:6px;align-items:center;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.btn{border-radius:6px;font-weight:600;font-size:13px;padding:7px 12px;cursor:pointer;border:1px solid}
+.btn.sm{font-size:12px;padding:4px 8px}
+.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn.teal{background:var(--teal);color:#fff;border-color:var(--teal)}
+.btn.amber{background:var(--amber);color:#3a2c00;border-color:var(--amber)}
+.btn.ghost{background:#fff;color:var(--primary);border-color:var(--mid)}
+.btn.danger{background:#fff;color:var(--err);border-color:#e0a0a8}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:4px 6px;text-align:left;vertical-align:top}th{color:var(--navy);font-size:12px}
+.synth{margin-top:8px;border-radius:12px;padding:16px;background:var(--light);border:1px solid var(--soft)}
+.synth label{display:block;font-size:14px;font-weight:600;margin-bottom:4px;color:var(--navy)}
+.pill{display:inline-block;margin-top:8px;font-size:12px;padding:2px 10px;border-radius:999px}
+.drawer{width:300px;flex-shrink:0;background:#fff;border-left:1px solid var(--mid);overflow-y:auto;padding:16px}
+.issue{font-size:12px;border-radius:6px;padding:8px;display:flex;gap:8px;margin-bottom:8px}
+.small{font-size:11px;color:var(--blue)}.flex1{flex:1}
+@media(max-width:780px){.rail{display:none}.grid2,.grid3{grid-template-columns:1fr}.drawer{display:none}}
+</style>
+</head>
+<body>
+<div id="loading"><div class="spin"></div><div style="color:#0C4F8E;font-weight:600">Memuat Studio Strategi…</div></div>
+<div id="root"></div>
+<script>
+window.__fail=setTimeout(function(){var l=document.getElementById('loading');if(l)l.style.display='none';var r=document.getElementById('root');if(r&&!r.hasChildNodes())r.innerHTML='<div style="padding:32px;max-width:600px;margin:40px auto"><h2 style="color:#0C4F8E">Library gagal dimuat</h2><p>Periksa koneksi internet lalu muat ulang.</p></div>';},5000);
+</script>
+<script>
+(function(){
+if(typeof React==='undefined'||typeof ReactDOM==='undefined')return;
+clearTimeout(window.__fail);
+var h=React.createElement,useState=React.useState,useReducer=React.useReducer,useMemo=React.useMemo;
+
+var STAGES=["Pembingkaian","Eksternal","Internal","Portofolio & Sintesis","Perumusan","Peta, Selaras, Pantau"];
+var SPINE=["Di mana kita sekarang","Ke mana kita ingin pergi","Bagaimana mencapainya","Apa yang kita butuhkan","Bagaimana memantau & beradaptasi"];
+var ANSOFF={"market-penetration":{label:"Penetrasi Pasar",risk:"Risiko terendah",desc:"Produk lama, pasar lama"},"product-development":{label:"Pengembangan Produk",risk:"Risiko sedang",desc:"Produk baru, pasar lama"},"market-development":{label:"Pengembangan Pasar",risk:"Risiko sedang",desc:"Produk lama, pasar baru"},"diversification":{label:"Diversifikasi",risk:"Risiko tertinggi",desc:"Produk baru, pasar baru"}};
+var BOWMAN=[{n:1,label:"Murah-Nilai Rendah"},{n:2,label:"Harga Rendah"},{n:3,label:"Hybrid"},{n:4,label:"Diferensiasi"},{n:5,label:"Diferensiasi Terfokus"},{n:6,label:"Harga Tinggi Berisiko"},{n:7,label:"Monopoli Berisiko"},{n:8,label:"Kehilangan Nilai"}];
+var SEVENS=[["strategy","Strategy"],["structure","Structure"],["systems","Systems"],["sharedValues","Shared Values"],["style","Style"],["staff","Staff"],["skills","Skills"]];
+
+function mkPestel(a){return["Political","Economic","Social","Technological","Environmental","Legal"].map(function(f,i){return{factor:f,note:a[i][0],impact:a[i][1],dir:a[i][2],tag:a[i][3]?"fact":"assumption",source:a[i][3]||"",date:""};});}
+function mkForces(a){return["Rivalitas","Pendatang Baru","Substitusi","Daya Tawar Pembeli","Daya Tawar Pemasok"].map(function(f,i){return{force:f,score:a[i][0],note:a[i][1]};});}
+
+var SCENARIOS={
+bank:{meta:{entity:"Bank Nusantara Abadi",level:"corp",industry:"Perbankan: Konvensional vs Digital",
+decision:"Transformasi penuh jadi bank digital, atau hybrid branch-light yang menjaga kekuatan cabang?",
+vision:"Bank kepercayaan keluarga Indonesia di era digital.",
+mission:"Layanan keuangan mudah, aman, manusiawi — digital + jaringan fisik terkurasi.",
+objectives:"CASA 65% (2028); 15 jt pengguna aplikasi aktif; BOPO 70%.",
+mintzberg:"Plan: digitalisasi bertahap. Pattern: konservatif pengikut. Position: bank menengah berbasis trust. Perspective: kehati-hatian. Ploy: bundling payroll+KPR."},
+pestel:mkPestel([["Konsolidasi OJK; modal inti minimum naik","H","threat","POJK 12/2020"],["Kelas menengah tumbuh; bunga fluktuatif tekan NIM","H","opportunity",""],["Nasabah muda mobile-first; cabang dianggap repot","H","opportunity","Survei 2025"],["Open banking, AI scoring, BI-FAST","H","opportunity","BI SNAP"],["Tuntutan green financing","M","opportunity",""],["UU PDP: biaya kepatuhan naik","M","threat","UU 27/2022"]]),
+forces:mkForces([[5,"Bank digital, BUMN, fintech berebut ritel"],[4,"Bank digital baru, CAC agresif"],[4,"E-wallet, paylater"],[4,"Pindah bank semudah unduh aplikasi"],[2,"DPK & vendor IT moderat"]]),
+forcesVerdict:"Daya tarik rendah-menengah: empat tekanan tinggi. Pemenang = pemilik dana murah (CASA), trust, dan biaya layanan terendah — bukan sekadar fitur aplikasi.",
+market:{size:120,growth:9,ourShare:10},
+shares:[{name:"Bank Mega-Nas",share:25},{name:"Bank Digital X",share:12},{name:"Kami",share:10},{name:"Fintech/Neo",share:8},{name:"Lainnya",share:45}],
+scenarios:{axisX:"Kecepatan migrasi digital nasabah",axisY:"Ketatnya regulasi bank digital",quad:{
+q1:{name:"Digital Terbuka",desc:"Migrasi cepat + regulasi longgar: perang fitur & bakar uang.",implication:"Akuisisi via ekosistem, bukan promo."},
+q2:{name:"Digital Terkawal",desc:"Migrasi cepat + regulasi ketat: pemegang lisensi menang.",implication:"Jadikan kepatuhan & keamanan selling point."},
+q3:{name:"Hybrid Panjang",desc:"Migrasi lambat: cabang relevan lama.",implication:"Branch-light: kurangi, jangan matikan."},
+q4:{name:"Status Quo Mahal",desc:"Biaya ganda dua kanal.",implication:"Disiplin biaya; digitalisasi internal dulu."}}},
+stakeholders:[{name:"OJK & BI",power:9,interest:8,stance:"neutral"},{name:"Nasabah muda",power:5,interest:8,stance:"support"},{name:"Serikat pekerja cabang",power:4,interest:9,stance:"resist"},{name:"Investor institusi",power:8,interest:7,stance:"support"}],
+valueChain:[{kind:"primary",activity:"Akuisisi nasabah",persp:"Customer",note:"CAC digital naik"},{kind:"primary",activity:"Kredit & scoring",persp:"Risk",note:"Scoring tradisional"},{kind:"support",activity:"Treasury",persp:"Financial",note:"CASA payroll kuat"},{kind:"support",activity:"IT & keamanan",persp:"People",note:"Talenta digital langka"}],
+resources:[{type:"Financial",name:"CASA payroll korporasi",note:"Dana murah & lengket"},{type:"Intangible",name:"Trust 40 tahun",note:"Kuat di tier-2/3"},{type:"Tangible",name:"400 cabang",note:"Aset atau beban?"},{type:"Human",name:"RM senior berjejaring",note:"Sulit direplikasi"}],
+ratios:[{name:"ROE %",prev:12,cur:13},{name:"NIM %",prev:5.1,cur:4.7},{name:"BOPO %",prev:82,cur:79},{name:"CASA %",prev:55,cur:58}],
+vrio:[{resource:"CASA payroll",v:true,r:true,i:true,o:true},{resource:"Trust daerah",v:true,r:true,i:false,o:true},{resource:"400 cabang",v:false,r:false,i:false,o:true},{resource:"Aplikasi mobile",v:true,r:false,i:false,o:false}],
+bcgUnits:[{name:"Tabungan digital",growth:20,relShare:0.5},{name:"Kredit korporasi",growth:5,relShare:1.4},{name:"KPR",growth:8,relShare:1.1},{name:"Wealth",growth:18,relShare:0.4}],
+horizons:{h1:{desc:"Kredit korporasi & KPR",now:75,future:45},h2:{desc:"Digital retail & wealth",now:20,future:40},h3:{desc:"Embedded finance/BaaS",now:5,future:15}},
+swot:{s:"CASA murah; trust; RM berjejaring",w:"Aplikasi tertinggal; BOPO tinggi; talenta digital minim",o:"Migrasi digital; open banking; green financing",t:"Bank digital agresif; NIM tertekan; regulasi modal"},
+tows:{so:"",st:"",wo:"",wt:""},generic:"Diferensiasi",ansoff:"product-development",
+ansoffNote:"Produk digital baru untuk basis nasabah lama — jaga trust, modernisasi pengalaman.",
+blueOcean:{factors:[{factor:"Jumlah cabang",us:7,industry:8,action:"reduce"},{factor:"UX aplikasi",us:4,industry:6,action:"raise"},{factor:"Biaya admin",us:6,industry:6,action:"eliminate"},{factor:"Advisory hybrid RM+AI",us:3,industry:2,action:"create"}]},
+bmc:{partners:"Payroll korporasi; fintech; asuransi",activities:"Intermediasi; scoring; layanan hybrid",resources:"CASA; RM; lisensi",value:"Bank tepercaya, kini semudah fintech",relationships:"RM personal + self-service",channels:"Aplikasi; cabang terkurasi; laku pandai",segments:"Keluarga urban; payroll; UMKM",costs:"BOPO cabang; IT; SDM",revenue:"NII; fee; bancassurance"},
+corpMoves:"Aliansi e-commerce (embedded finance B2B2C). Akuisisi kecil wealth-tech. Core banking sewa cloud, jangan bangun sendiri.",
+allocation:"Realokasi 40% capex cabang ke digital (3 th). Gerbang H3 berdasarkan traksi H2.",
+sevenS:{strategy:"Hybrid branch-light + digital retail",structure:"Divisi digital ber-P&L sendiri",systems:"Core cloud; scoring AI bertahap",sharedValues:"Amanah, dekat dengan nasabah",style:"Konservatif → eksperimen terukur",staff:"RM kuat, engineer kurang",skills:"Relationship unggul; data science lemah"},
+bowman:3,bowmanNote:"Hybrid: nilai di atas rata-rata, biaya admin lebih rendah dari bank besar.",
+house:{vision:"Bank kepercayaan keluarga di era digital",battles:["Menang nasabah muda tanpa kehilangan senior","CASA digital 65%","BOPO 70%"],initiatives:["Relaunch aplikasi","Branch-light 400→250","Embedded finance"],enablers:["Core cloud","Talenta digital","Data platform"],foundation:["Trust & kepatuhan","Budaya melayani","Modal kuat"]},
+bsc:[{persp:"Financial",objective:"Efisiensi",kpi:"BOPO",target:"70%"},{persp:"Customer",objective:"Adopsi digital",kpi:"Pengguna aktif",target:"15jt"},{persp:"Internal Process",objective:"Kredit cepat",kpi:"SLA approval",target:"1 hari"},{persp:"Learning & Growth",objective:"Talenta",kpi:"Engineer terisi",target:"200"}],
+monitoring:"Churn muda >15% → percepat fitur. CAC digital >3x cabang → geser ke ekosistem. NPL digital >3.5% → perketat scoring.",syntheses:{}},
+
+mining:{meta:{entity:"PT Mineral Karya Bumi",level:"corp",industry:"Pertambangan: ESG & Energi Hijau",
+decision:"Hilirisasi nikel + energi hijau, atau maksimalkan kas batu bara selagi bisa?",
+vision:"Penambang Indonesia yang memimpin transisi mineral masa depan.",
+mission:"Menambang bertanggung jawab, mengolah di dalam negeri, menumbuhkan energi terbarukan.",
+objectives:"50% EBITDA dari nikel/hilirisasi (2030); emisi -30%; ESG kuartil atas.",
+mintzberg:"Plan: hilirisasi bertahap. Pattern: penambang bijih. Position: biaya menengah. Perspective: ekstraktif → stewardship. Ploy: kontrak jangka panjang OEM baterai."},
+pestel:mkPestel([["Hilirisasi & larangan ekspor bijih","H","opportunity","UU Minerba"],["Harga nikel & batu bara volatil","H","threat","LME"],["Tekanan komunitas: lingkungan & kerja","M","threat","AMDAL"],["HPAL, smelter, PLTS tambang","H","opportunity",""],["Dekarbonisasi; pembiayaan batu bara mengering","H","threat","Taksonomi OJK"],["Izin & reklamasi diperketat","M","threat","PP 96/2021"]]),
+forces:mkForces([[3,"Pemain besar terkonsolidasi"],[2,"Capex & izin = tembok tinggi"],[3,"Daur ulang baterai & LFP"],[4,"OEM & smelter global banyak pilihan"],[3,"Alat berat & BBM tersandera harga global"]]),
+forcesVerdict:"Menengah: barrier tinggi melindungi, tapi pembeli kuat dan substitusi kimia baterai (LFP) nyata. Nilai bergeser ke hilir — yang berhenti di bijih jadi price-taker selamanya.",
+market:{size:80,growth:15,ourShare:7},
+shares:[{name:"Grup A",share:28},{name:"Grup B (BUMN)",share:20},{name:"Kami",share:7},{name:"Menengah",share:25},{name:"Lainnya",share:20}],
+scenarios:{axisX:"Kecepatan transisi EV global",axisY:"Ketegasan penegakan ESG",quad:{
+q1:{name:"Green Rush",desc:"EV cepat + ESG tegas: nikel hijau premium.",implication:"Sertifikasi penuh; jual 'nikel bersih' berpremi."},
+q2:{name:"Balapan Kotor",desc:"EV cepat + ESG longgar: volume & harga rendah menang.",implication:"Efisiensi + kontrak jangka panjang OEM."},
+q3:{name:"Transisi Tersendat",desc:"Batu bara dihukum, nikel belum panen.",implication:"Perpanjang kas batu bara disiplin; jangan overinvest smelter."},
+q4:{name:"Dunia Lama",desc:"Status quo menguntungkan sementara.",implication:"Maksimalkan kas, tetap bangun opsi hijau."}}},
+stakeholders:[{name:"ESDM & KLHK",power:9,interest:8,stance:"neutral"},{name:"Komunitas lingkar tambang",power:6,interest:9,stance:"resist"},{name:"Investor global ESG",power:8,interest:8,stance:"neutral"},{name:"OEM baterai",power:7,interest:7,stance:"support"}],
+valueChain:[{kind:"primary",activity:"Penambangan",persp:"Process",note:"Grade menurun"},{kind:"primary",activity:"Smelter JV",persp:"Financial",note:"Kapasitas kecil"},{kind:"primary",activity:"Logistik & pelabuhan sendiri",persp:"Process",note:"Keunggulan struktural"},{kind:"support",activity:"HSE & komunitas",persp:"Risk",note:"Insiden = izin terancam"}],
+resources:[{type:"Tangible",name:"Cadangan limonit besar",note:"Cocok HPAL/baterai"},{type:"Tangible",name:"Pelabuhan sendiri",note:"Hemat struktural"},{type:"Financial",name:"Kas batu bara",note:"Mesin kas 5-8 th lagi"},{type:"Intangible",name:"Rekam jejak izin bersih",note:"Modal ESG"}],
+ratios:[{name:"EBITDA margin %",prev:38,cur:34},{name:"Net debt/EBITDA",prev:1.1,cur:1.4},{name:"Strip ratio",prev:7.5,cur:8.2},{name:"Emisi t/t",prev:2.1,cur:1.9}],
+vrio:[{resource:"Cadangan limonit kelas baterai",v:true,r:true,i:true,o:false},{resource:"Logistik terintegrasi",v:true,r:true,i:false,o:true},{resource:"Kas batu bara",v:true,r:false,i:false,o:true},{resource:"Rekam jejak ESG",v:true,r:true,i:false,o:false}],
+bcgUnits:[{name:"Nikel baterai",growth:30,relShare:0.6},{name:"Batu bara termal",growth:2,relShare:1.5},{name:"Smelter JV",growth:15,relShare:0.8},{name:"Energi terbarukan",growth:25,relShare:0.1}],
+horizons:{h1:{desc:"Batu bara & bijih",now:80,future:35},h2:{desc:"Hilirisasi & nikel hijau",now:15,future:45},h3:{desc:"EBT & daur ulang baterai",now:5,future:20}},
+swot:{s:"Cadangan; logistik; kas batu bara",w:"Ketergantungan batu bara; smelter kecil; energi diesel",o:"Hilirisasi; premi hijau; pembiayaan hijau",t:"LFP; harga volatil; pembiayaan mengering; resistensi komunitas"},
+tows:{so:"",st:"",wo:"",wt:""},generic:"Diferensiasi",ansoff:"product-development",
+ansoffNote:"Nikel olahan bersertifikat hijau untuk pembeli lama. EBT = taruhan H3, bukan utama.",
+blueOcean:{factors:[{factor:"Ekspor bijih mentah",us:6,industry:7,action:"eliminate"},{factor:"Intensitas emisi",us:5,industry:6,action:"reduce"},{factor:"Transparansi ESG",us:4,industry:3,action:"raise"},{factor:"Nikel bersertifikat hijau",us:2,industry:1,action:"create"}]},
+bmc:{partners:"OEM baterai; mitra smelter; pembiaya hijau",activities:"Menambang; mengolah; sertifikasi ESG",resources:"Cadangan; pelabuhan; kas",value:"Nikel bersih terlacak dari tambang bertanggung jawab",relationships:"Kontrak jangka panjang; komunitas",channels:"Kontrak langsung OEM",segments:"OEM global; smelter domestik",costs:"Strip; energi; reklamasi",revenue:"Bijih → olahan; premi hijau; PPA"},
+corpMoves:"JV smelter kedua (bagi risiko capex). Akuisisi IUP limonit tetangga. PLTS tambang: bukti ESG sekaligus hemat diesel.",
+allocation:"70% capex ke hilirisasi, 20% energi hijau, 10% batu bara (sustaining saja, tanpa ekspansi).",
+sevenS:{strategy:"Hilirisasi + ESG sebagai diferensiator",structure:"Batu bara di-ring-fence",systems:"ERP ada; pelacakan emisi belum",sharedValues:"'Menambang untuk anak cucu'",style:"Produksi-sentris; perlu suara ESG di direksi",staff:"Insinyur tambang kuat; ahli ESG kurang",skills:"Operasi unggul; pemasaran olahan baru"},
+bowman:4,bowmanNote:"Diferensiasi: nikel hijau berpremi untuk OEM yang butuh rantai pasok bersih.",
+house:{vision:"Memimpin transisi mineral masa depan",battles:["EBITDA nikel > batu bara 2030","Nikel hijau tersertifikasi","Zero konflik komunitas material"],initiatives:["Smelter JV #2","PLTS 100 MW","Pelacakan ESG"],enablers:["Talenta metalurgi","Pembiayaan hijau","Kemitraan OEM"],foundation:["Keselamatan","Izin & kepatuhan","Kas disiplin"]},
+bsc:[{persp:"Financial",objective:"Geser bauran",kpi:"% EBITDA non-batu bara",target:"50%"},{persp:"Customer",objective:"Kontrak OEM",kpi:"Volume terkontrak 5th",target:"70%"},{persp:"Internal Process",objective:"Turunkan emisi",kpi:"t CO2/t",target:"-30%"},{persp:"Learning & Growth",objective:"Metalurgi",kpi:"Posisi kunci terisi",target:"90%"}],
+monitoring:"Nikel < biaya kas+15% 2 kuartal → tunda smelter #2. Insiden komunitas → bekukan ekspansi. LFP >50% pasar EV → percepat diversifikasi.",syntheses:{}},
+
+auto:{meta:{entity:"PT AutoPrima Motor",level:"bu",industry:"Otomotif: Tekanan EV",
+decision:"Bangun lini EV sendiri, aliansi dengan pemain Tiongkok, atau maksimalkan ICE + hybrid?",
+vision:"Merek mobilitas pilihan keluarga, apapun penggeraknya.",
+mission:"Kendaraan andal, jaringan layanan terluas, elektrifikasi terjangkau.",
+objectives:"Pangsa 12% dijaga; 30% penjualan elektrifikasi (2029); NPS layanan #1.",
+mintzberg:"Plan: elektrifikasi via hybrid. Pattern: pengikut cepat. Position: value keluarga. Perspective: 'mobil = investasi keluarga'. Ploy: jaminan resale melawan keraguan EV."},
+pestel:mkPestel([["Insentif EV: PPN 1%; TKDN wajib","H","opportunity","Perpres EV"],["Daya beli tertekan; bunga kredit tinggi","H","threat",""],["Konsumen muda terbuka merek baru","H","threat","Survei"],["Harga baterai turun; charging meluas","H","threat","BNEF"],["Target emisi diwacanakan","M","threat",""],["Homologasi EV","L","opportunity","Kemenhub"]]),
+forces:mkForces([[5,"Merek EV Tiongkok: harga agresif, fitur tinggi"],[4,"Platform EV lebih sederhana dari ICE"],[3,"Transportasi online & umum"],[4,"Banyak pilihan; perang harga"],[3,"Baterai terkonsentrasi"]]),
+forcesVerdict:"Tidak menarik tanpa diferensiasi: rivalitas ekstrem, pembeli berkuasa. Keunggulan kami bukan produk — melainkan jaringan layanan, trust, resale value. Ke sanalah perang dipindahkan.",
+market:{size:100,growth:4,ourShare:12},
+shares:[{name:"Jepang #1",share:30},{name:"Jepang #2",share:15},{name:"Kami",share:12},{name:"EV Tiongkok",share:13},{name:"Lainnya",share:30}],
+scenarios:{axisX:"Kecepatan adopsi EV nasional",axisY:"Intensitas perang harga",quad:{
+q1:{name:"Banjir Listrik",desc:"EV cepat + perang harga: margin hancur.",implication:"Jangan ikut perang harga; menang di TCO & layanan."},
+q2:{name:"Transisi Sehat",desc:"EV cepat + harga rasional.",implication:"Luncurkan EV aliansi tepat waktu."},
+q3:{name:"ICE Bertahan",desc:"Hybrid raja dekade ini.",implication:"Maksimalkan hybrid; EV satu model halo."},
+q4:{name:"Perang Semua Lini",desc:"ICE & EV sama-sama berdarah.",implication:"Disiplin biaya; lindungi aftersales."}}},
+stakeholders:[{name:"Prinsipal",power:9,interest:8,stance:"neutral"},{name:"Jaringan dealer",power:6,interest:9,stance:"resist"},{name:"Konsumen keluarga",power:5,interest:7,stance:"support"},{name:"Pemerintah",power:8,interest:6,stance:"support"}],
+valueChain:[{kind:"primary",activity:"Perakitan & TKDN",persp:"Process",note:"Belum siap EV"},{kind:"primary",activity:"Distribusi & dealer",persp:"Customer",note:"Terluas ke-2 — aset kunci"},{kind:"primary",activity:"Aftersales",persp:"Financial",note:"Margin tertinggi; terancam EV"},{kind:"support",activity:"Captive finance",persp:"Financial",note:"Pengunci loyalitas"}],
+resources:[{type:"Tangible",name:"300 dealer & bengkel",note:"Sampai tier-3"},{type:"Intangible",name:"Reputasi resale value",note:"20 tahun"},{type:"Financial",name:"Captive finance",note:"Data kredit"},{type:"Human",name:"Teknisi tersertifikasi",note:"Perlu re-skilling EV"}],
+ratios:[{name:"Margin operasi %",prev:6.5,cur:4.8},{name:"Inventory days",prev:45,cur:62},{name:"Pangsa %",prev:13,cur:12},{name:"Aftersales %",prev:22,cur:24}],
+vrio:[{resource:"Jaringan dealer & bengkel",v:true,r:true,i:true,o:true},{resource:"Reputasi resale",v:true,r:true,i:false,o:true},{resource:"Captive finance",v:true,r:false,i:false,o:false},{resource:"Lini ICE",v:false,r:false,i:false,o:true}],
+bcgUnits:[{name:"MPV ICE",growth:1,relShare:1.3},{name:"SUV Hybrid",growth:18,relShare:0.7},{name:"EV",growth:45,relShare:0.2},{name:"Aftersales",growth:6,relShare:1.5}],
+horizons:{h1:{desc:"ICE & aftersales",now:75,future:35},h2:{desc:"Hybrid & elektrifikasi jaringan",now:20,future:45},h3:{desc:"EV penuh + layanan charging",now:5,future:20}},
+swot:{s:"Jaringan; resale; captive finance; aftersales",w:"Tanpa platform EV; margin tertekan; dealer resisten",o:"Insentif EV; hybrid booming; layanan charging",t:"Merek Tiongkok; perang harga; aftersales menyusut era EV"},
+tows:{so:"",st:"",wo:"",wt:""},generic:"Diferensiasi",ansoff:"product-development",
+ansoffNote:"Hybrid & EV untuk pelanggan keluarga lama, dijual lewat jaringan, trust, resale, pembiayaan.",
+blueOcean:{factors:[{factor:"Harga jual unit",us:5,industry:4,action:"reduce"},{factor:"Jaminan resale EV",us:3,industry:1,action:"create"},{factor:"TCO transparan",us:4,industry:2,action:"raise"},{factor:"Ekosistem charging rumah",us:1,industry:2,action:"create"}]},
+bmc:{partners:"Prinsipal; mitra EV; penyedia charging",activities:"Rakit; distribusi; layani; biayai",resources:"Jaringan; brand; captive finance",value:"Transisi listrik tanpa cemas: resale terjamin, bengkel di mana-mana",relationships:"Seumur kepemilikan: jual-rawat-tukar",channels:"Dealer; online; armada",segments:"Keluarga; armada; first-time EV",costs:"Perakitan; jaringan; re-skilling",revenue:"Unit; aftersales; pembiayaan; trade-in"},
+corpMoves:"Aliansi (bukan akuisisi) pemain EV Tiongkok: mereka bawa platform, kami bawa jaringan & trust. Integrasi maju ke charging rumahan. Jangan bangun platform sendiri — terlambat & mahal.",
+allocation:"50% elektrifikasi jaringan & re-skilling, 30% hybrid, 20% pilot EV aliansi. Aftersales dilindungi sebagai mesin kas.",
+sevenS:{strategy:"Follower cepat via aliansi",structure:"Unit EV terpisah dari budaya ICE",systems:"Dealer management; belum ada telemetri",sharedValues:"'Andal & terjangkau' — termasuk listrik",style:"Hierarkis; perlu otonomi lokal",staff:"Teknisi ICE banyak; EV <5%",skills:"Distribusi unggul; software lemah"},
+bowman:3,bowmanNote:"Hybrid: nilai lebih tinggi dari merek Tiongkok pada harga bersaing. Hindari posisi 1-2 — perang yang tak bisa dimenangkan.",
+house:{vision:"Merek mobilitas pilihan keluarga",battles:["Jaga pangsa 12%","30% elektrifikasi 2029","Aftersales bertransformasi"],initiatives:["Aliansi platform EV","Jaminan resale EV","300 bengkel siap EV"],enablers:["Re-skilling teknisi","Data telemetri","Captive finance EV"],foundation:["Trust keandalan","Jaringan terluas","Disiplin biaya"]},
+bsc:[{persp:"Financial",objective:"Jaga margin",kpi:"Margin operasi",target:"6%"},{persp:"Customer",objective:"Kepuasan",kpi:"NPS layanan",target:"#1"},{persp:"Internal Process",objective:"Kesiapan EV",kpi:"Bengkel siap EV",target:"300"},{persp:"Learning & Growth",objective:"Teknisi EV",kpi:"Tersertifikasi EV",target:"40%"}],
+monitoring:"Pangsa Tiongkok >20% → percepat EV aliansi. Aftersales -10% YoY → paket perawatan EV. Inventory >75 hari → pangkas produksi ICE.",syntheses:{}},
+
+health:{meta:{entity:"MedikaPrima Group",level:"corp",industry:"Kesehatan: Presisi & Gaya Hidup Sehat",
+decision:"Bangun pusat pengobatan presisi & genomik, atau ekspansi klinik preventif — dengan urutan apa?",
+vision:"Menjaga orang Indonesia tetap sehat — bukan hanya mengobati saat sakit.",
+mission:"Menghubungkan pencegahan, diagnosis presisi, dan perawatan dalam satu perjalanan pasien.",
+objectives:"30% pendapatan preventif-presisi (2030); NPS 70; okupansi RS >65%.",
+mintzberg:"Plan: dari RS jadi ekosistem kesehatan. Pattern: tumbuh lewat RS baru. Position: menengah-atas urban. Perspective: klinis-sentris → pasien-sentris. Ploy: langganan kesehatan keluarga."},
+pestel:mkPestel([["Tarif BPJS menekan margin dasar","H","threat","Perpres JKN"],["Kelas menengah mau bayar preventif out-of-pocket","H","opportunity",""],["Tren wellness, wearable, MCU rutin","H","opportunity","Riset 2025"],["Genomik murah; AI diagnostik; telemedicine","H","opportunity",""],["Limbah medis & energi RS","L","threat",""],["Regulasi telemedicine & data genetik belum matang","M","threat","Permenkes"]]),
+forces:mkForces([[4,"Grup RS ekspansi; klinik butik menjamur"],[3,"Healthtech masuk dari sisi wellness"],[4,"Telemedicine, apotek digital, berobat ke LN"],[3,"Asuransi & korporasi menekan tarif"],[4,"Dokter spesialis langka — pemasok terkuat"]]),
+forcesVerdict:"Menengah: volume dasar tertekan BPJS & substitusi, tapi segmen preventif-presisi tumbuh dua digit dengan persaingan belum padat. Kelangkaan spesialis = kendala strategis #1 — strategi yang tak menjawabnya akan gagal.",
+market:{size:60,growth:11,ourShare:9},
+shares:[{name:"Grup A",share:22},{name:"Grup B",share:15},{name:"Kami",share:9},{name:"Klinik & healthtech",share:14},{name:"Lainnya",share:40}],
+scenarios:{axisX:"Kecepatan adopsi pengobatan presisi",axisY:"Pergeseran preventif vs kuratif",quad:{
+q1:{name:"Kesehatan 4.0",desc:"Presisi cepat + preventif dominan.",implication:"Integrasikan genomik ke paket preventif — first mover nyata."},
+q2:{name:"Presisi Elit",desc:"Genomik hanya onkologi kelas atas.",implication:"Pusat presisi butik, jangan skala massal dulu."},
+q3:{name:"Wellness Massal",desc:"MCU, gizi, kebugaran arus utama.",implication:"Ekspansi klinik preventif agresif; genomik menyusul."},
+q4:{name:"Dunia BPJS",desc:"Volume rendah margin.",implication:"Efisiensi RS; preventif diferensiasi tipis."}}},
+stakeholders:[{name:"Kemenkes & BPJS",power:9,interest:7,stance:"neutral"},{name:"Dokter spesialis",power:8,interest:8,stance:"neutral"},{name:"Pasien urban",power:5,interest:8,stance:"support"},{name:"Asuransi & korporasi",power:7,interest:7,stance:"support"}],
+valueChain:[{kind:"primary",activity:"Rawat jalan & inap",persp:"Process",note:"Margin BPJS tipis"},{kind:"primary",activity:"Lab & diagnostik",persp:"Financial",note:"Margin terbaik; kandidat presisi"},{kind:"primary",activity:"Preventif & MCU",persp:"Customer",note:"Tumbuh cepat, belum terpaket"},{kind:"support",activity:"Rekrutmen dokter",persp:"People",note:"Kendala #1"},{kind:"support",activity:"Rekam medis & data",persp:"Risk",note:"Terfragmentasi"}],
+resources:[{type:"Human",name:"120 spesialis tetap",note:"Loyalitas di atas rata-rata"},{type:"Tangible",name:"6 RS + 20 klinik urban",note:"Lokasi premium"},{type:"Intangible",name:"Reputasi klinis 25 th",note:"Kuat maternitas & jantung"},{type:"Financial",name:"Neraca sehat",note:"Ruang ekspansi"}],
+ratios:[{name:"EBITDA %",prev:18,cur:16},{name:"Okupansi %",prev:68,cur:64},{name:"Pendapatan/pasien",prev:100,cur:108},{name:"% non-BPJS",prev:55,cur:60}],
+vrio:[{resource:"Basis spesialis loyal",v:true,r:true,i:true,o:false},{resource:"Reputasi maternitas & jantung",v:true,r:true,i:false,o:true},{resource:"Lokasi premium",v:true,r:false,i:false,o:true},{resource:"Data pasien longitudinal",v:true,r:true,i:true,o:false}],
+bcgUnits:[{name:"RS umum kuratif",growth:6,relShare:1.2},{name:"Lab & presisi",growth:25,relShare:0.5},{name:"Klinik preventif",growth:18,relShare:0.3},{name:"Telemedicine",growth:30,relShare:0.4}],
+horizons:{h1:{desc:"RS kuratif",now:75,future:45},h2:{desc:"Preventif, MCU premium, presisi",now:20,future:40},h3:{desc:"Genomik populasi & langganan",now:5,future:15}},
+swot:{s:"Dokter loyal; reputasi; lokasi; neraca",w:"Data terfragmentasi; margin BPJS; okupansi turun; belum ada genomik",o:"Wellness boom; genomik murah; asuransi korporasi",t:"Healthtech; berobat LN; perang talenta dokter; regulasi data genetik"},
+tows:{so:"",st:"",wo:"",wt:""},generic:"Diferensiasi",ansoff:"product-development",
+ansoffNote:"Urutan: klinik preventif dulu (terbukti, capex ringan, hasilkan data), pusat presisi menyusul di atas data itu.",
+blueOcean:{factors:[{factor:"Waktu tunggu & antrean",us:4,industry:3,action:"eliminate"},{factor:"Paket preventif personal",us:2,industry:1,action:"create"},{factor:"Pengalaman pasien",us:5,industry:4,action:"raise"},{factor:"Langganan kesehatan keluarga",us:1,industry:1,action:"create"}]},
+bmc:{partners:"Asuransi; korporasi; lab genomik; wearable",activities:"Merawat; mencegah; diagnosis presisi",resources:"Dokter; RS & klinik; data; reputasi",value:"Satu partner kesehatan seumur hidup: cegah, deteksi dini, rawat presisi",relationships:"Langganan keluarga; care manager",channels:"RS; klinik; aplikasi; B2B korporasi",segments:"Keluarga urban; korporasi; pasien kronis",costs:"SDM medis; alat; teknologi",revenue:"Kuratif; paket preventif; langganan; B2B"},
+corpMoves:"Kemitraan lab genomik global (jangan bangun sendiri). Akuisisi klinik wellness yang sudah jalan. Integrasi data pasien = prasyarat semua ekspansi.",
+allocation:"50% preventif & integrasi data, 30% presisi (gerbang per milestone), 20% efisiensi RS. Retensi dokter = anggaran terproteksi.",
+sevenS:{strategy:"Dari kuratif ke ekosistem cegah-deteksi-rawat",structure:"Unit preventif & presisi terpisah dari RS",systems:"Rekam medis terfragmentasi — prioritas integrasi",sharedValues:"'Menjaga sehat' menggantikan 'mengisi tempat tidur'",style:"Klinis-hierarkis → kolaboratif lintas disiplin",staff:"Spesialis kuat; genetic counselor belum ada",skills:"Klinis unggul; lemah produk digital & pemasaran gaya hidup"},
+bowman:5,bowmanNote:"Diferensiasi terfokus: presisi-preventif premium untuk segmen yang membayar kesehatan, bukan sekadar pengobatan.",
+house:{vision:"Menjaga orang Indonesia tetap sehat",battles:["30% pendapatan preventif-presisi 2030","Satu data pasien terintegrasi","Tempat kerja pilihan dokter"],initiatives:["20 klinik preventif","Pusat presisi (kemitraan)","Langganan keluarga"],enablers:["Integrasi rekam medis","Genetic counselor & data scientist","Kemitraan asuransi"],foundation:["Keselamatan pasien","Etika data genetik","Neraca disiplin"]},
+bsc:[{persp:"Financial",objective:"Geser bauran",kpi:"% preventif-presisi",target:"30%"},{persp:"Customer",objective:"Loyalitas",kpi:"Keluarga berlangganan",target:"50rb"},{persp:"Internal Process",objective:"Data terintegrasi",kpi:"Unit dalam 1 rekam medis",target:"100%"},{persp:"Learning & Growth",objective:"Retensi dokter",kpi:"Turnover spesialis",target:"<5%"}],
+monitoring:"Turnover dokter >8% → paket retensi, tunda ekspansi. Adopsi langganan < target 2 kuartal → ubah proposisi, jangan tambah klinik. Regulasi data genetik terbit → audit dulu sebelum skala.",syntheses:{}}
+};
+var SEED=SCENARIOS.bank;
+
+function blank(){return{meta:{entity:"",level:"bu",industry:"",decision:"",vision:"",mission:"",objectives:"",mintzberg:""},
+pestel:mkPestel([["","M","opportunity",""],["","M","opportunity",""],["","M","opportunity",""],["","M","opportunity",""],["","M","opportunity",""],["","M","opportunity",""]]),
+forces:mkForces([[3,""],[3,""],[3,""],[3,""],[3,""]]),
+forcesVerdict:"",market:{size:0,growth:0,ourShare:0},shares:[{name:"",share:0}],
+scenarios:{axisX:"Sumbu X",axisY:"Sumbu Y",quad:{q1:{name:"",desc:"",implication:""},q2:{name:"",desc:"",implication:""},q3:{name:"",desc:"",implication:""},q4:{name:"",desc:"",implication:""}}},
+stakeholders:[{name:"",power:5,interest:5,stance:"neutral"}],
+valueChain:[{kind:"primary",activity:"",persp:"Process",note:""}],
+resources:[{type:"Financial",name:"",note:""}],ratios:[{name:"ROE %",prev:0,cur:0}],
+vrio:[{resource:"",v:false,r:false,i:false,o:false}],bcgUnits:[{name:"",growth:0,relShare:1}],
+horizons:{h1:{desc:"",now:0,future:0},h2:{desc:"",now:0,future:0},h3:{desc:"",now:0,future:0}},
+swot:{s:"",w:"",o:"",t:""},tows:{so:"",st:"",wo:"",wt:""},generic:"",ansoff:"market-penetration",ansoffNote:"",
+blueOcean:{factors:[{factor:"",us:5,industry:5,action:"raise"}]},
+bmc:{partners:"",activities:"",resources:"",value:"",relationships:"",channels:"",segments:"",costs:"",revenue:""},
+corpMoves:"",allocation:"",sevenS:{strategy:"",structure:"",systems:"",sharedValues:"",style:"",staff:"",skills:""},
+bowman:3,bowmanNote:"",house:{vision:"",battles:[""],initiatives:[""],enablers:[""],foundation:[""]},
+bsc:[{persp:"Financial",objective:"",kpi:"",target:""}],monitoring:"",syntheses:{}};}
+
+function computeHHI(sh){var sum=0,hh=0;sh.forEach(function(s){var v=Number(s.share)||0;sum+=v;hh+=Math.pow(v/100,2);});return{hhi:hh,sum:sum,cls:hh<0.15?"rendah":hh<=0.25?"sedang":"tinggi"};}
+function vrioOut(r){if(!r.v)return"Kelemahan";if(!r.r)return"Paritas";if(!r.i)return"Keunggulan sementara";if(!r.o)return"Keunggulan tak termanfaatkan";return"Keunggulan berkelanjutan";}
+function bcgQ(u){var g=Number(u.growth)>=10,s=Number(u.relShare)>=1;if(g&&s)return{q:"Star",p:"Investasi pertahankan"};if(g&&!s)return{q:"Question Mark",p:"Danai selektif / keluar"};if(!g&&s)return{q:"Cash Cow",p:"Panen, danai lainnya"};return{q:"Dog",p:"Divestasi / reposisi"};}
+
+function critique(s){
+var out=[];function add(sev,w,t){out.push({sev:sev,weight:w,text:t});}
+var H=computeHHI(s.shares);
+if(Math.abs(H.sum-100)>5)add("warn",50,"Total pangsa pasar "+H.sum.toFixed(0)+"%, bukan ~100%.");
+var hi=s.forces.filter(function(f){return Number(f.score)>=4;}).length;
+var v=(s.forcesVerdict||"").toLowerCase();
+if(hi>=3&&/(menarik|menguntungkan)/.test(v)&&!/tidak menarik|kurang menarik/.test(v))add("err",80,'Verdik Five Forces "menarik" padahal '+hi+' kekuatan bertekanan tinggi (≥4).');
+var initText=(s.house.initiatives.join(" ")+" "+s.allocation).toLowerCase();
+s.bcgUnits.forEach(function(u){if(bcgQ(u).q==="Star"){var n=(u.name||"").toLowerCase();if(n&&initText.indexOf(n.split(" ")[0])<0)add("warn",55,'BCG Star "'+u.name+'" tak punya inisiatif terdanai yang jelas.');}});
+s.vrio.forEach(function(r){if(vrioOut(r)==="Keunggulan berkelanjutan"&&!r.resource.trim())add("err",70,"Klaim VRIO 'berkelanjutan' tanpa sumber daya disebut.");});
+var g=(s.generic||"").toLowerCase();
+if(g.indexOf("biaya")>=0&&s.vrio.some(function(r){return vrioOut(r).indexOf("berkelanjutan")>=0;}))add("warn",60,"Kepemimpinan Biaya dipilih padahal ada aset diferensiasi. Risiko stuck-in-the-middle.");
+["now","future"].forEach(function(k){var tot=["h1","h2","h3"].reduce(function(a,x){return a+(Number(s.horizons[x][k])||0);},0);if(Math.abs(tot-100)>5)add("warn",40,"3 Horizons ("+(k==="now"?"kini":"depan")+") = "+tot+"%, bukan ~100%.");});
+if(s.meta.vision&&s.bsc.length){var vw=(s.meta.vision.toLowerCase().match(/[a-z]{5,}/g)||[]);var bt=s.bsc.map(function(b){return b.objective+" "+b.kpi;}).join(" ").toLowerCase();if(vw.length&&!vw.some(function(w){return bt.indexOf(w)>=0;}))add("warn",50,"Visi ↔ Scorecard: tak ada tema visi di KPI manapun.");}
+if(["so","st","wo","wt"].filter(function(k){return(s.tows[k]||"").trim();}).length===0)add("info",30,"TOWS kosong — SWOT belum jadi aksi.");
+var fH3=Number(s.horizons.h3.future)||0;
+if(fH3>=20&&!s.bcgUnits.some(function(u){return["Star","Question Mark"].indexOf(bcgQ(u).q)>=0;}))add("warn",45,"H3 ditarget "+fH3+"% tapi tak ada Star/Question Mark penopangnya.");
+if(s.ansoff==="diversification"&&s.meta.level==="bu")add("warn",40,"Diversifikasi Ansoff di level Unit Bisnis — biasanya keputusan korporat.");
+if(s.ansoff==="diversification"&&g.indexOf("fokus")>=0)add("warn",50,"Diversifikasi bertabrakan dengan strategi Fokus.");
+var bold=s.blueOcean.factors.filter(function(f){return f.action==="create"||f.action==="eliminate";}).length;
+if(!bold&&s.blueOcean.factors.some(function(f){return f.factor.trim();}))add("info",35,"Blue Ocean: tanpa Create/Eliminate = bersaing lebih keras, bukan samudra biru.");
+if(Object.keys(s.bmc).some(function(k){return(s.bmc[k]||"").trim();})&&!(s.bmc.value||"").trim())add("warn",45,"BMC terisi tapi Proposisi Nilai kosong.");
+s.stakeholders.forEach(function(st){if(Number(st.power)>=7&&st.stance==="resist")add("err",65,'"'+(st.name||"(tanpa nama)")+'" berkuasa tinggi & menolak — kelola erat atau strategi macet.');});
+var quads=Object.keys(s.scenarios.quad).filter(function(k){return(s.scenarios.quad[k].implication||"").trim();}).length;
+if(quads>0&&quads<4)add("info",25,"Skenario: baru "+quads+"/4 kuadran punya implikasi.");
+var f7=SEVENS.filter(function(p){return(s.sevenS[p[0]]||"").trim();}).length;
+if(f7>=4&&!(s.sevenS.sharedValues||"").trim())add("warn",48,"7S: elemen lain terisi tapi Shared Values kosong — 7S runtuh tanpa pusatnya.");
+if(f7>0&&f7<7)add("info",24,"7S: baru "+f7+"/7 terisi. Ketidakselarasan bersembunyi di elemen kosong.");
+if(Number(s.bowman)>=6)add("err",68,"Bowman posisi "+s.bowman+" ("+BOWMAN[s.bowman-1].label+") — tidak kompetitif berkelanjutan.");
+if(Number(s.bowman)<=2&&g.indexOf("diferensiasi")>=0)add("warn",52,"Posisi Bowman harga-rendah bertabrakan dengan Diferensiasi.");
+STAGES.forEach(function(st,i){if(!(s.syntheses[i]||"").trim())add("info",20,'Tahap '+i+' ("'+st+'") belum punya sintesis.');});
+s.pestel.forEach(function(p){if(p.impact==="H"&&p.tag==="assumption")add("info",22,'PESTEL dampak tinggi "'+p.factor+'" masih asumsi tanpa sumber.');});
+var rank={err:0,warn:1,info:2};out.sort(function(a,b){return rank[a.sev]-rank[b.sev]||b.weight-a.weight;});return out;}
+
+function reducer(state,a){var n;switch(a.type){
+case"LOAD":return a.payload;
+case"SET":n=structuredClone(state);var ref=n;for(var i=0;i<a.path.length-1;i++)ref=ref[a.path[i]];ref[a.path[a.path.length-1]]=a.value;return n;
+case"ARR":n=structuredClone(state);n[a.key][a.index][a.field]=a.value;return n;
+case"ADD":n=structuredClone(state);n[a.key].push(structuredClone(a.row));return n;
+case"DEL":n=structuredClone(state);n[a.key].splice(a.index,1);return n;
+case"SYN":n=structuredClone(state);n.syntheses[a.stage]=a.value;return n;
+default:return state;}}
+
+function download(name,text,mime){var b=new Blob([text],{type:mime});var u=URL.createObjectURL(b);var a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
+function esc(x){return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function buildDoc(s){
+var H=computeHHI(s.shares);var P=function(t){return"<p>"+esc(t)+"</p>";};var b="";
+b+='<div class="cover"><div class="brand">DDK Training &amp; Consulting</div><div class="ttl">'+esc(s.meta.entity)+'</div><div class="sub">Dokumen Strategi · '+esc(s.meta.industry)+'</div></div>';
+b+="<h1>Ringkasan Eksekutif</h1>"+P("Keputusan: "+s.meta.decision)+P("Visi: "+s.meta.vision)+P("Sasaran: "+s.meta.objectives)+P("Generik: "+s.generic+" · Ansoff: "+(ANSOFF[s.ansoff]||{}).label+" · Bowman: "+s.bowman+" ("+BOWMAN[s.bowman-1].label+")");
+b+="<h1>Eksternal</h1><h2>PESTEL</h2><ul>"+s.pestel.map(function(p){return"<li><b>"+esc(p.factor)+"</b> ("+p.impact+"/"+p.dir+"): "+esc(p.note)+(p.tag==="fact"?" <i>("+esc(p.source||"—")+")</i>":" <i>(asumsi)</i>")+"</li>";}).join("")+"</ul>";
+b+="<h2>Five Forces</h2><ul>"+s.forces.map(function(f){return"<li>"+esc(f.force)+": "+f.score+"/5 — "+esc(f.note)+"</li>";}).join("")+"</ul>"+P("Verdik: "+s.forcesVerdict);
+b+="<h2>Pasar</h2>"+P("Ukuran "+s.market.size+" | Tumbuh "+s.market.growth+"% | Pangsa "+s.market.ourShare+"% | HHI "+H.hhi.toFixed(3)+" ("+H.cls+")");
+b+="<h2>Skenario 2×2</h2>"+P(s.scenarios.axisX+" × "+s.scenarios.axisY)+"<ul>"+Object.keys(s.scenarios.quad).map(function(k){var q=s.scenarios.quad[k];return q.name?"<li><b>"+esc(q.name)+":</b> "+esc(q.desc)+" → <i>"+esc(q.implication)+"</i></li>":"";}).join("")+"</ul>";
+b+="<h2>Pemangku Kepentingan</h2><table><tr><th>Nama</th><th>Kuasa</th><th>Minat</th><th>Sikap</th></tr>"+s.stakeholders.map(function(st){return"<tr><td>"+esc(st.name)+"</td><td>"+st.power+"</td><td>"+st.interest+"</td><td>"+st.stance+"</td></tr>";}).join("")+"</table>";
+b+="<h1>Internal</h1><h2>Rantai Nilai</h2><ul>"+s.valueChain.map(function(vc){return"<li>["+vc.kind+"/"+vc.persp+"] "+esc(vc.activity)+" — "+esc(vc.note)+"</li>";}).join("")+"</ul>";
+b+="<h2>VRIO</h2><table><tr><th>Sumber Daya</th><th>Hasil</th></tr>"+s.vrio.map(function(r){return"<tr><td>"+esc(r.resource)+"</td><td>"+vrioOut(r)+"</td></tr>";}).join("")+"</table>";
+b+="<h2>McKinsey 7S</h2><table>"+SEVENS.map(function(p){return"<tr><th>"+p[1]+"</th><td>"+esc(s.sevenS[p[0]])+"</td></tr>";}).join("")+"</table>";
+b+="<h2>Rasio</h2><table><tr><th>Rasio</th><th>Sblm</th><th>Kini</th></tr>"+s.ratios.map(function(r){return"<tr><td>"+esc(r.name)+"</td><td>"+r.prev+"</td><td>"+r.cur+"</td></tr>";}).join("")+"</table>";
+b+="<h1>Portofolio</h1><h2>BCG</h2><ul>"+s.bcgUnits.map(function(u){var q=bcgQ(u);return"<li>"+esc(u.name)+": "+q.q+" — "+q.p+"</li>";}).join("")+"</ul>";
+b+="<h2>3 Horizons</h2><ul>"+["h1","h2","h3"].map(function(x){var hh=s.horizons[x];return"<li>"+x.toUpperCase()+": "+esc(hh.desc)+" ("+hh.now+"% → "+hh.future+"%)</li>";}).join("")+"</ul>";
+b+="<h2>SWOT</h2><table><tr><th>Kekuatan</th><th>Kelemahan</th></tr><tr><td>"+esc(s.swot.s)+"</td><td>"+esc(s.swot.w)+"</td></tr><tr><th>Peluang</th><th>Ancaman</th></tr><tr><td>"+esc(s.swot.o)+"</td><td>"+esc(s.swot.t)+"</td></tr></table>";
+b+="<h2>TOWS</h2><table><tr><th>SO</th><td>"+esc(s.tows.so)+"</td></tr><tr><th>ST</th><td>"+esc(s.tows.st)+"</td></tr><tr><th>WO</th><td>"+esc(s.tows.wo)+"</td></tr><tr><th>WT</th><td>"+esc(s.tows.wt)+"</td></tr></table>";
+b+="<h1>Perumusan</h1>"+P("Generik: "+s.generic)+P("Ansoff: "+(ANSOFF[s.ansoff]||{}).label+" — "+s.ansoffNote)+P("Bowman: "+s.bowman+" ("+BOWMAN[s.bowman-1].label+") — "+s.bowmanNote)+P("Langkah korporat: "+s.corpMoves)+P("Alokasi: "+s.allocation);
+b+="<h2>Blue Ocean</h2><table><tr><th>Faktor</th><th>Aksi</th><th>Kami</th><th>Industri</th></tr>"+s.blueOcean.factors.filter(function(f){return f.factor;}).map(function(f){return"<tr><td>"+esc(f.factor)+"</td><td>"+f.action+"</td><td>"+f.us+"</td><td>"+f.industry+"</td></tr>";}).join("")+"</table>";
+b+="<h2>BMC</h2><table>"+[["Mitra","partners"],["Aktivitas","activities"],["Sumber Daya","resources"],["Proposisi Nilai","value"],["Hubungan","relationships"],["Kanal","channels"],["Segmen","segments"],["Biaya","costs"],["Pendapatan","revenue"]].map(function(p){return"<tr><th>"+p[0]+"</th><td>"+esc(s.bmc[p[1]])+"</td></tr>";}).join("")+"</table>";
+b+="<h1>Peta, Selaras, Pantau</h1>"+P("Visi: "+s.house.vision)+P("Pertempuran: "+s.house.battles.join("; "))+P("Inisiatif: "+s.house.initiatives.join("; "));
+b+="<h2>Balanced Scorecard</h2><table><tr><th>Perspektif</th><th>Sasaran</th><th>KPI</th><th>Target</th></tr>"+s.bsc.map(function(x){return"<tr><td>"+x.persp+"</td><td>"+esc(x.objective)+"</td><td>"+esc(x.kpi)+"</td><td>"+esc(x.target)+"</td></tr>";}).join("")+"</table>";
+b+="<h2>Pemantauan</h2>"+P(s.monitoring);
+var iss=critique(s);if(iss.length)b+="<h1>Bendera heuristik</h1><ul>"+iss.map(function(i){return"<li>["+i.sev+"] "+esc(i.text)+"</li>";}).join("")+"</ul>";
+var css="body{font-family:Calibri,sans-serif;font-size:11pt;line-height:1.45;color:#1c2733}.cover{border-bottom:4px solid #0C4F8E;padding-bottom:18px;margin-bottom:24px}.brand{color:#15A89C;font-weight:bold;font-size:10pt;text-transform:uppercase}.ttl{color:#0C4F8E;font-size:26pt;font-weight:bold}.sub{color:#5a6b7d;font-size:12pt}h1{color:#0C4F8E;font-size:16pt;border-bottom:2px solid #B8C7D9;padding-bottom:4px;margin-top:22px}h2{color:#0F5FA8;font-size:13pt}table{border-collapse:collapse;width:100%;margin:8px 0}th,td{border:1px solid #B8C7D9;padding:6px 8px;font-size:10pt;text-align:left;vertical-align:top}th{background:#F4F7FB;color:#0C4F8E}";
+return'<!DOCTYPE html><html><head><meta charset="utf-8"><style>'+css+'</style></head><body>'+b+'</body></html>';}
+function exportDocx(s){download((s.meta.entity||"strategi")+"-dokumen.doc",buildDoc(s),"application/msword");}
+function exportPDF(s){var html=buildDoc(s).replace("</head>",'<style>@page{margin:18mm}</style><scr'+'ipt>window.onload=function(){window.print()}</scr'+'ipt></head>');var w=window.open("","_blank");if(!w){alert("Izinkan pop-up untuk PDF, atau gunakan Ekspor Word.");return;}w.document.open();w.document.write(html);w.document.close();}
+
+function field(label,value,onCh,opt){opt=opt||{};var inner=opt.rows?h("textarea",{rows:opt.rows,value:value,onChange:function(e){onCh(e.target.value);}}):h("input",{type:opt.type||"text",value:value,onChange:function(e){onCh(opt.type==="number"?Number(e.target.value):e.target.value);}});return h("label",{className:"fld"},h("span",null,label),inner);}
+function card(title,hint,children){return h("section",{className:"card"},h("div",{className:"cardhead"},h("h3",null,title),hint?h("p",null,hint):null),h("div",{className:"cardbody"},children));}
+function btn(label,onClick,kind,sm){return h("button",{className:"btn "+(kind||"primary")+(sm?" sm":""),onClick:onClick},label);}
+function synth(stage,state,dispatch){var val=state.syntheses[stage]||"";return h("div",{className:"synth"},h("label",null,"Sintesis Anda (wajib untuk menyelesaikan tahap)"),h("textarea",{rows:3,value:val,placeholder:"Tulis penilaian Anda sendiri — ini keputusan Anda, bukan keputusan framework.",onChange:function(e){dispatch({type:"SYN",stage:stage,value:e.target.value});}}),h("span",{className:"pill",style:{background:val.trim()?"#dff3e6":"#fce8d8",color:val.trim()?"#1a7f4b":"#b5651d"}},val.trim()?"Selesai":"Perlu sintesis"));}
+function arrRow(d,key,i){return function(){d({type:"DEL",key:key,index:i});};}
+
+function Stage0(s,d){var set=function(k,v){d({type:"SET",path:["meta",k],value:v});};
+return[card("Pembingkaian","Lingkup & satu keputusan. Bukan untuk menyelesaikan strateginya sekarang.",[
+h("div",{className:"grid2"},field("Entitas",s.meta.entity,function(v){set("entity",v);}),
+h("label",{className:"fld"},h("span",null,"Tingkat"),h("select",{value:s.meta.level,onChange:function(e){set("level",e.target.value);}},h("option",{value:"corp"},"Korporat / Holding"),h("option",{value:"sub"},"Subholding"),h("option",{value:"bu"},"Unit Bisnis"),h("option",{value:"cabang"},"Cabang"))),
+field("Industri",s.meta.industry,function(v){set("industry",v);}),
+field("Satu keputusan di atas meja",s.meta.decision,function(v){set("decision",v);})),
+field("Refleksi Mintzberg 5P",s.meta.mintzberg,function(v){set("mintzberg",v);},{rows:3})]),
+card("Visi / Misi / Sasaran",null,[field("Visi",s.meta.vision,function(v){set("vision",v);},{rows:2}),field("Misi",s.meta.mission,function(v){set("mission",v);},{rows:2}),field("Sasaran",s.meta.objectives,function(v){set("objectives",v);},{rows:2})]),
+synth(0,s,d)];}
+
+function Stage1(s,d){var H=computeHHI(s.shares);
+return[card("PESTEL","Pindai makro dengan tag fakta vs asumsi.",s.pestel.map(function(p,i){
+return h("div",{key:i,style:{marginBottom:"12px",paddingBottom:"12px",borderBottom:"1px solid #F4F7FB"}},
+h("div",{className:"row"},h("span",{style:{fontWeight:600,width:"110px",color:"#0C4F8E"}},p.factor),
+h("select",{value:p.impact,onChange:function(e){d({type:"ARR",key:"pestel",index:i,field:"impact",value:e.target.value});},style:{width:"auto"}},h("option",null,"H"),h("option",null,"M"),h("option",null,"L")),
+h("select",{value:p.dir,onChange:function(e){d({type:"ARR",key:"pestel",index:i,field:"dir",value:e.target.value});},style:{width:"auto"}},h("option",{value:"opportunity"},"peluang"),h("option",{value:"threat"},"ancaman")),
+h("select",{value:p.tag,onChange:function(e){d({type:"ARR",key:"pestel",index:i,field:"tag",value:e.target.value});},style:{width:"auto"}},h("option",{value:"fact"},"Bersumber"),h("option",{value:"assumption"},"Asumsi"))),
+h("input",{value:p.note,placeholder:"catatan faktor",onChange:function(e){d({type:"ARR",key:"pestel",index:i,field:"note",value:e.target.value});}}),
+p.tag==="fact"?h("input",{value:p.source,placeholder:"sumber",onChange:function(e){d({type:"ARR",key:"pestel",index:i,field:"source",value:e.target.value});},style:{marginTop:"4px"}}):null);})),
+card("Porter Five Forces","Tekanan industri; verdik = penilaian Anda.",[
+s.forces.map(function(f,i){return h("div",{key:i,className:"row"},
+h("span",{style:{width:"150px",color:"#0C4F8E"}},f.force),
+h("input",{type:"range",min:1,max:5,value:f.score,onChange:function(e){d({type:"ARR",key:"forces",index:i,field:"score",value:Number(e.target.value)});},style:{width:"100px"}}),
+h("span",{style:{fontWeight:700,width:"18px",color:f.score>=4?"#b00020":"#1C6FB8"}},f.score),
+h("input",{value:f.note,onChange:function(e){d({type:"ARR",key:"forces",index:i,field:"note",value:e.target.value});},className:"flex1"}));}),
+field("Verdik daya tarik industri (penilaian Anda)",s.forcesVerdict,function(v){d({type:"SET",path:["forcesVerdict"],value:v});},{rows:2})]),
+card("Pasar & HHI",null,[
+h("div",{className:"grid3"},field("Ukuran pasar",s.market.size,function(v){d({type:"SET",path:["market","size"],value:v});},{type:"number"}),field("Pertumbuhan %",s.market.growth,function(v){d({type:"SET",path:["market","growth"],value:v});},{type:"number"}),field("Pangsa kami %",s.market.ourShare,function(v){d({type:"SET",path:["market","ourShare"],value:v});},{type:"number"})),
+h("div",{className:"small",style:{marginBottom:"6px",color:(H.sum>105||H.sum<95)?"#b00020":"#1C6FB8"}},"Total pangsa: "+H.sum.toFixed(0)+"% · HHI "+H.hhi.toFixed(3)+" → konsentrasi "+H.cls),
+s.shares.map(function(sh,i){return h("div",{key:i,className:"row"},
+h("input",{value:sh.name,placeholder:"pesaing",onChange:function(e){d({type:"ARR",key:"shares",index:i,field:"name",value:e.target.value});},className:"flex1"}),
+h("input",{type:"number",value:sh.share,onChange:function(e){d({type:"ARR",key:"shares",index:i,field:"share",value:Number(e.target.value)});},style:{width:"80px"}}),
+btn("×",arrRow(d,"shares",i),"danger",true));}),
+btn("+ pesaing",function(){d({type:"ADD",key:"shares",row:{name:"",share:0}});},"ghost",true),
+h(BarMini,{data:s.shares})]),
+card("Perencanaan Skenario (2×2)","Uji strategi terhadap 2 ketidakpastian kritis.",[
+h("div",{className:"grid2"},field("Ketidakpastian sumbu X",s.scenarios.axisX,function(v){d({type:"SET",path:["scenarios","axisX"],value:v});}),field("Ketidakpastian sumbu Y",s.scenarios.axisY,function(v){d({type:"SET",path:["scenarios","axisY"],value:v});})),
+h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px"}},["q1","q2","q3","q4"].map(function(k){
+return h("div",{key:k,style:{background:"#F4F7FB",border:"1px solid #6FA3D9",borderRadius:"8px",padding:"10px"}},
+h("input",{value:s.scenarios.quad[k].name,placeholder:"nama skenario",onChange:function(e){d({type:"SET",path:["scenarios","quad",k,"name"],value:e.target.value});},style:{fontWeight:600,marginBottom:"4px"}}),
+h("textarea",{rows:2,value:s.scenarios.quad[k].desc,placeholder:"seperti apa dunia ini",onChange:function(e){d({type:"SET",path:["scenarios","quad",k,"desc"],value:e.target.value});},style:{marginBottom:"4px",fontSize:"12px"}}),
+h("textarea",{rows:2,value:s.scenarios.quad[k].implication,placeholder:"→ implikasi strategis",onChange:function(e){d({type:"SET",path:["scenarios","quad",k,"implication"],value:e.target.value});},style:{fontSize:"12px",background:"#fffdf6",borderColor:"#F0A202"}}));}))]),
+card("Peta Pemangku Kepentingan (Kuasa × Minat)","Kanan-atas = kelola erat.",[
+s.stakeholders.map(function(st,i){return h("div",{key:i,className:"row"},
+h("input",{value:st.name,placeholder:"pemangku kepentingan",onChange:function(e){d({type:"ARR",key:"stakeholders",index:i,field:"name",value:e.target.value});},className:"flex1"}),
+h("span",{className:"small"},"K"),h("input",{type:"number",min:0,max:10,value:st.power,onChange:function(e){d({type:"ARR",key:"stakeholders",index:i,field:"power",value:Number(e.target.value)});},style:{width:"56px"}}),
+h("span",{className:"small"},"M"),h("input",{type:"number",min:0,max:10,value:st.interest,onChange:function(e){d({type:"ARR",key:"stakeholders",index:i,field:"interest",value:Number(e.target.value)});},style:{width:"56px"}}),
+h("select",{value:st.stance,onChange:function(e){d({type:"ARR",key:"stakeholders",index:i,field:"stance",value:e.target.value});},style:{width:"auto"}},h("option",{value:"support"},"mendukung"),h("option",{value:"neutral"},"netral"),h("option",{value:"resist"},"menolak")),
+btn("×",arrRow(d,"stakeholders",i),"danger",true));}),
+btn("+ pemangku",function(){d({type:"ADD",key:"stakeholders",row:{name:"",power:5,interest:5,stance:"neutral"}});},"ghost",true),
+h(StakeGrid,{data:s.stakeholders})]),
+synth(1,s,d)];}
+
+function Stage2(s,d){var PERSP=["People","Process","Financial","Customer","Risk"];
+return[card("Rantai Nilai",null,[
+s.valueChain.map(function(v,i){return h("div",{key:i,className:"row"},
+h("select",{value:v.kind,onChange:function(e){d({type:"ARR",key:"valueChain",index:i,field:"kind",value:e.target.value});},style:{width:"auto"}},h("option",{value:"primary"},"utama"),h("option",{value:"support"},"pendukung")),
+h("input",{value:v.activity,placeholder:"aktivitas",onChange:function(e){d({type:"ARR",key:"valueChain",index:i,field:"activity",value:e.target.value});},className:"flex1"}),
+h("select",{value:v.persp,onChange:function(e){d({type:"ARR",key:"valueChain",index:i,field:"persp",value:e.target.value});},style:{width:"auto"}},PERSP.map(function(p){return h("option",{key:p},p);})),
+h("input",{value:v.note,placeholder:"catatan",onChange:function(e){d({type:"ARR",key:"valueChain",index:i,field:"note",value:e.target.value});},className:"flex1"}),
+btn("×",arrRow(d,"valueChain",i),"danger",true));}),
+btn("+ aktivitas",function(){d({type:"ADD",key:"valueChain",row:{kind:"primary",activity:"",persp:"Process",note:""}});},"ghost",true)]),
+card("Audit Sumber Daya","Menilai keunggulan = tugas VRIO.",[
+s.resources.map(function(r,i){return h("div",{key:i,className:"row"},
+h("select",{value:r.type,onChange:function(e){d({type:"ARR",key:"resources",index:i,field:"type",value:e.target.value});},style:{width:"auto"}},["Financial","Human","Tangible","Intangible"].map(function(p){return h("option",{key:p},p);})),
+h("input",{value:r.name,placeholder:"sumber daya",onChange:function(e){d({type:"ARR",key:"resources",index:i,field:"name",value:e.target.value});},className:"flex1"}),
+h("input",{value:r.note,placeholder:"catatan",onChange:function(e){d({type:"ARR",key:"resources",index:i,field:"note",value:e.target.value});},className:"flex1"}),
+btn("×",arrRow(d,"resources",i),"danger",true));}),
+btn("+ sumber daya",function(){d({type:"ADD",key:"resources",row:{type:"Financial",name:"",note:""}});},"ghost",true)]),
+card("Rasio Keuangan (tren)",null,[
+h("table",null,h("thead",null,h("tr",null,h("th",null,"Rasio"),h("th",null,"Sblm"),h("th",null,"Kini"),h("th",null,"Tren"),h("th",null,""))),
+h("tbody",null,s.ratios.map(function(r,i){var dd=Number(r.cur)-Number(r.prev);
+return h("tr",{key:i},h("td",null,h("input",{value:r.name,onChange:function(e){d({type:"ARR",key:"ratios",index:i,field:"name",value:e.target.value});}})),
+h("td",null,h("input",{type:"number",value:r.prev,onChange:function(e){d({type:"ARR",key:"ratios",index:i,field:"prev",value:Number(e.target.value)});},style:{width:"70px"}})),
+h("td",null,h("input",{type:"number",value:r.cur,onChange:function(e){d({type:"ARR",key:"ratios",index:i,field:"cur",value:Number(e.target.value)});},style:{width:"70px"}})),
+h("td",{style:{fontWeight:700,color:dd>0?"#1a7f4b":dd<0?"#b00020":"#1C6FB8"}},(dd>0?"▲":dd<0?"▼":"—")+" "+dd.toFixed(1)),
+h("td",null,btn("×",arrRow(d,"ratios",i),"danger",true)));}))),
+h("div",{style:{marginTop:"8px"}},btn("+ rasio",function(){d({type:"ADD",key:"ratios",row:{name:"",prev:0,cur:0}});},"ghost",true))]),
+card("VRIO",null,[
+h("table",null,h("thead",null,h("tr",null,h("th",null,"Sumber Daya"),h("th",null,"V"),h("th",null,"R"),h("th",null,"I"),h("th",null,"O"),h("th",null,"Hasil"),h("th",null,""))),
+h("tbody",null,s.vrio.map(function(r,i){return h("tr",{key:i},
+h("td",null,h("input",{value:r.resource,onChange:function(e){d({type:"ARR",key:"vrio",index:i,field:"resource",value:e.target.value});}})),
+["v","r","i","o"].map(function(f){return h("td",{key:f,style:{textAlign:"center"}},h("input",{type:"checkbox",checked:r[f],style:{width:"auto"},onChange:function(e){d({type:"ARR",key:"vrio",index:i,field:f,value:e.target.checked});}}));}),
+h("td",{style:{fontSize:"12px",fontWeight:600,color:vrioOut(r).indexOf("berkelanjutan")>=0?"#1a7f4b":"#1C6FB8"}},vrioOut(r)),
+h("td",null,btn("×",arrRow(d,"vrio",i),"danger",true)));}))),
+h("div",{style:{marginTop:"8px"}},btn("+ sumber daya",function(){d({type:"ADD",key:"vrio",row:{resource:"",v:false,r:false,i:false,o:false}});},"ghost",true))]),
+card("McKinsey 7S","Strategi hanya jalan jika 7 elemen selaras. Shared Values = pusatnya.",
+h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"8px"}},SEVENS.map(function(p){var accent=p[0]==="sharedValues";
+return h("div",{key:p[0],style:{background:accent?"#f0fbf9":"#F4F7FB",border:"1px solid "+(accent?"#15A89C":"#B8C7D9"),borderRadius:"8px",padding:"8px"}},
+h("div",{style:{fontSize:"11px",fontWeight:700,marginBottom:"4px",color:accent?"#15A89C":"#0C4F8E"}},p[1]),
+h("textarea",{rows:2,value:s.sevenS[p[0]],onChange:function(e){d({type:"SET",path:["sevenS",p[0]],value:e.target.value});},style:{fontSize:"12px",background:"#fff"}}));}))),
+synth(2,s,d)];}
+
+function Stage3(s,d){
+return[card("Matriks BCG",null,[
+s.bcgUnits.map(function(u,i){var q=bcgQ(u);
+return h("div",{key:i,className:"row"},
+h("input",{value:u.name,placeholder:"unit",onChange:function(e){d({type:"ARR",key:"bcgUnits",index:i,field:"name",value:e.target.value});},className:"flex1"}),
+h("input",{type:"number",value:u.growth,title:"pertumbuhan %",onChange:function(e){d({type:"ARR",key:"bcgUnits",index:i,field:"growth",value:Number(e.target.value)});},style:{width:"70px"}}),
+h("input",{type:"number",step:"0.1",value:u.relShare,title:"pangsa relatif",onChange:function(e){d({type:"ARR",key:"bcgUnits",index:i,field:"relShare",value:Number(e.target.value)});},style:{width:"70px"}}),
+h("span",{className:"small",style:{fontWeight:600,background:"#F4F7FB",padding:"4px 8px",borderRadius:"4px",color:"#0C4F8E"}},q.q+" · "+q.p),
+btn("×",arrRow(d,"bcgUnits",i),"danger",true));}),
+btn("+ unit",function(){d({type:"ADD",key:"bcgUnits",row:{name:"",growth:0,relShare:1}});},"ghost",true)]),
+card("McKinsey 3 Horizons","Kolom: kontribusi % kini / masa depan.",
+["h1","h2","h3"].map(function(x){return h("div",{key:x,className:"row"},
+h("span",{style:{fontWeight:600,width:"30px",color:"#0C4F8E"}},x.toUpperCase()),
+h("input",{value:s.horizons[x].desc,onChange:function(e){d({type:"SET",path:["horizons",x,"desc"],value:e.target.value});},className:"flex1"}),
+h("input",{type:"number",value:s.horizons[x].now,onChange:function(e){d({type:"SET",path:["horizons",x,"now"],value:Number(e.target.value)});},style:{width:"70px"}}),
+h("input",{type:"number",value:s.horizons[x].future,onChange:function(e){d({type:"SET",path:["horizons",x,"future"],value:Number(e.target.value)});},style:{width:"70px"}}));})),
+card("SWOT → TOWS","Ubah posisi menjadi aksi.",[
+h("div",{className:"grid2"},[["s","Kekuatan"],["w","Kelemahan"],["o","Peluang"],["t","Ancaman"]].map(function(p){return field(p[1],s.swot[p[0]],function(v){d({type:"SET",path:["swot",p[0]],value:v});},{rows:2});})),
+h("div",{className:"grid2"},[["so","SO — kekuatan × peluang"],["st","ST — kekuatan × ancaman"],["wo","WO — kelemahan × peluang"],["wt","WT — kelemahan × ancaman"]].map(function(p){return field(p[1],s.tows[p[0]],function(v){d({type:"SET",path:["tows",p[0]],value:v});},{rows:2});}))]),
+synth(3,s,d)];}
+
+function Stage4(s,d){
+var actionColor={create:"#15A89C",raise:"#1a7f4b",reduce:"#F0A202",eliminate:"#b00020"};
+var BMC=[["partners","Mitra Kunci"],["activities","Aktivitas Kunci"],["resources","Sumber Daya Kunci"],["value","Proposisi Nilai"],["relationships","Hubungan Pelanggan"],["channels","Kanal"],["segments","Segmen Pelanggan"],["costs","Struktur Biaya"],["revenue","Arus Pendapatan"]];
+return[card("Strategi Generik (Porter)",null,
+h("div",{className:"row"},["Kepemimpinan Biaya","Diferensiasi","Fokus"].map(function(o){var on=s.generic===o;
+return h("button",{key:o,className:"btn",onClick:function(){d({type:"SET",path:["generic"],value:o});},style:{background:on?"#0F5FA8":"#fff",color:on?"#fff":"#0F5FA8",borderColor:"#B8C7D9"}},o);}))),
+card("Bowman's Strategy Clock","Posisi harga-nilai yang lebih tajam. Posisi 6-8 = zona tidak kompetitif.",[
+h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px",marginBottom:"12px"}},BOWMAN.map(function(bp){
+var on=Number(s.bowman)===bp.n;var danger=bp.n>=6;
+return h("button",{key:bp.n,onClick:function(){d({type:"SET",path:["bowman"],value:bp.n});},style:{textAlign:"left",borderRadius:"8px",padding:"8px 10px",cursor:"pointer",background:on?(danger?"#b00020":"#0C4F8E"):"#fff",color:on?"#fff":(danger?"#b00020":"#0C4F8E"),border:"1.5px solid "+(on?(danger?"#b00020":"#0C4F8E"):(danger?"#e0a0a8":"#B8C7D9")),fontWeight:600,fontSize:"13px"}},bp.n+". "+bp.label);})),
+field("Rasional posisi Bowman",s.bowmanNote,function(v){d({type:"SET",path:["bowmanNote"],value:v});},{rows:2})]),
+card("Matriks Ansoff","Arah pertumbuhan, diurutkan risiko.",[
+h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px",maxWidth:"520px",marginBottom:"12px"}},
+["market-penetration","product-development","market-development","diversification"].map(function(k){var a=ANSOFF[k],on=s.ansoff===k;
+return h("button",{key:k,onClick:function(){d({type:"SET",path:["ansoff"],value:k});},style:{textAlign:"left",borderRadius:"8px",padding:"10px",cursor:"pointer",background:on?"#0C4F8E":"#fff",color:on?"#fff":"#0C4F8E",border:"1.5px solid "+(on?"#0C4F8E":"#B8C7D9")}},
+h("div",{style:{fontWeight:700}},a.label),
+h("div",{style:{fontSize:"12px",color:on?"#cfe2f5":"#1C6FB8"}},a.desc),
+h("div",{style:{fontSize:"11px",fontWeight:600,color:on?"#F0A202":"#b5651d"}},a.risk));})),
+field("Rasional Ansoff",s.ansoffNote,function(v){d({type:"SET",path:["ansoffNote"],value:v});},{rows:2})]),
+card("Blue Ocean — ERRC & Kanvas Strategi","Kurva Anda harus menyimpang, bukan menjiplak industri.",[
+s.blueOcean.factors.map(function(f,i){return h("div",{key:i,className:"row"},
+h("input",{value:f.factor,placeholder:"faktor persaingan",onChange:function(e){var n=structuredClone(s.blueOcean.factors);n[i].factor=e.target.value;d({type:"SET",path:["blueOcean","factors"],value:n});},className:"flex1"}),
+h("select",{value:f.action,onChange:function(e){var n=structuredClone(s.blueOcean.factors);n[i].action=e.target.value;d({type:"SET",path:["blueOcean","factors"],value:n});},style:{width:"auto",fontWeight:600,color:actionColor[f.action]}},h("option",{value:"eliminate"},"Hapus"),h("option",{value:"reduce"},"Kurangi"),h("option",{value:"raise"},"Tingkatkan"),h("option",{value:"create"},"Ciptakan")),
+h("span",{className:"small"},"Kami"),h("input",{type:"number",min:0,max:10,value:f.us,onChange:function(e){var n=structuredClone(s.blueOcean.factors);n[i].us=Number(e.target.value);d({type:"SET",path:["blueOcean","factors"],value:n});},style:{width:"55px"}}),
+h("span",{className:"small"},"Ind"),h("input",{type:"number",min:0,max:10,value:f.industry,onChange:function(e){var n=structuredClone(s.blueOcean.factors);n[i].industry=Number(e.target.value);d({type:"SET",path:["blueOcean","factors"],value:n});},style:{width:"55px"}}),
+btn("×",function(){var n=s.blueOcean.factors.filter(function(_,j){return j!==i;});d({type:"SET",path:["blueOcean","factors"],value:n});},"danger",true));}),
+btn("+ faktor",function(){d({type:"SET",path:["blueOcean","factors"],value:s.blueOcean.factors.concat([{factor:"",us:5,industry:5,action:"raise"}])});},"ghost",true),
+h(CanvasMini,{data:s.blueOcean.factors})]),
+card("Business Model Canvas","Proposisi Nilai = jantungnya.",
+h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"8px"}},BMC.map(function(p){var accent=p[0]==="value";
+return h("div",{key:p[0],style:{background:accent?"#f0fbf9":"#F4F7FB",border:"1px solid "+(accent?"#15A89C":"#B8C7D9"),borderRadius:"8px",padding:"8px"}},
+h("div",{style:{fontSize:"11px",fontWeight:700,marginBottom:"4px",color:accent?"#15A89C":"#0C4F8E"}},p[1]),
+h("textarea",{rows:3,value:s.bmc[p[0]],onChange:function(e){d({type:"SET",path:["bmc",p[0]],value:e.target.value});},style:{fontSize:"12px",background:"#fff"}}));}))),
+card("Langkah Korporat",null,field("Integrasi horizontal/vertikal; ekosistem/B2B2C",s.corpMoves,function(v){d({type:"SET",path:["corpMoves"],value:v});},{rows:3})),
+card("Alokasi Sumber Daya",null,field("Logika alokasi",s.allocation,function(v){d({type:"SET",path:["allocation"],value:v});},{rows:3})),
+synth(4,s,d)];}
+
+function Stage5(s,d){var BSC=["Financial","Customer","Internal Process","Learning & Growth"];
+return[card("Strategy House",null,
+h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"16px"}},
+h("div",null,field("Visi & Tujuan (atap)",s.house.vision,function(v){d({type:"SET",path:["house","vision"],value:v});}),
+["battles","initiatives","enablers","foundation"].map(function(key){
+var labels={battles:"Pertempuran kunci",initiatives:"Inisiatif strategis",enablers:"Enabler",foundation:"Fondasi"};
+return h("div",{key:key,style:{marginBottom:"12px"}},
+h("span",{style:{display:"block",fontSize:"12px",fontWeight:600,marginBottom:"4px",color:"#0C4F8E"}},labels[key]),
+s.house[key].map(function(it,i){return h("div",{key:i,className:"row"},
+h("input",{value:it,onChange:function(e){var n=s.house[key].slice();n[i]=e.target.value;d({type:"SET",path:["house",key],value:n});},className:"flex1"}),
+btn("×",function(){d({type:"SET",path:["house",key],value:s.house[key].filter(function(_,j){return j!==i;})});},"danger",true));}),
+btn("+ tambah",function(){d({type:"SET",path:["house",key],value:s.house[key].concat([""])});},"ghost",true));})),
+h("div",{style:{background:"#F4F7FB",borderRadius:"12px",padding:"12px"}},h(House,{h:s.house})))),
+card("Balanced Scorecard",null,[
+h("table",null,h("thead",null,h("tr",null,h("th",null,"Perspektif"),h("th",null,"Sasaran"),h("th",null,"KPI"),h("th",null,"Target"),h("th",null,""))),
+h("tbody",null,s.bsc.map(function(b,i){return h("tr",{key:i},
+h("td",null,h("select",{value:b.persp,onChange:function(e){d({type:"ARR",key:"bsc",index:i,field:"persp",value:e.target.value});}},BSC.map(function(p){return h("option",{key:p},p);}))),
+h("td",null,h("input",{value:b.objective,onChange:function(e){d({type:"ARR",key:"bsc",index:i,field:"objective",value:e.target.value});}})),
+h("td",null,h("input",{value:b.kpi,onChange:function(e){d({type:"ARR",key:"bsc",index:i,field:"kpi",value:e.target.value});}})),
+h("td",null,h("input",{value:b.target,onChange:function(e){d({type:"ARR",key:"bsc",index:i,field:"target",value:e.target.value});},style:{width:"80px"}})),
+h("td",null,btn("×",arrRow(d,"bsc",i),"danger",true)));}))),
+h("div",{style:{marginTop:"8px"}},btn("+ baris",function(){d({type:"ADD",key:"bsc",row:{persp:"Financial",objective:"",kpi:"",target:""}});},"ghost",true))]),
+card("Loop Pemantauan","Aturan pemicu → respons.",field("Pemicu dan respons",s.monitoring,function(v){d({type:"SET",path:["monitoring"],value:v});},{rows:3})),
+synth(5,s,d)];}
+
+function BarMini(props){var data=props.data.map(function(x){return{name:x.name||"—",v:Number(x.share)||0};});
+var max=Math.max.apply(null,data.map(function(x){return x.v;}).concat([1]));
+var W=Math.max(data.length*70,200),Hh=160,pad=24;
+return h("div",{style:{height:Hh+"px",overflowX:"auto",marginTop:"12px"}},
+h("svg",{viewBox:"0 0 "+W+" "+Hh,style:{width:"100%",height:"100%"}},
+data.map(function(x,i){var bh=(x.v/max)*(Hh-pad*2);
+return h("g",{key:i},h("rect",{x:i*70+20,y:Hh-pad-bh,width:40,height:bh,fill:"#0F5FA8",rx:4}),
+h("text",{x:i*70+40,y:Hh-pad+12,textAnchor:"middle",fontSize:9,fill:"#0C4F8E"},x.name.slice(0,8)),
+h("text",{x:i*70+40,y:Hh-pad-bh-4,textAnchor:"middle",fontSize:9,fill:"#1C6FB8"},x.v));})));}
+function StakeGrid(props){var col={support:"#1a7f4b",neutral:"#1C6FB8",resist:"#b00020"};var S=250;
+return h("div",{style:{marginTop:"12px"}},
+h("svg",{viewBox:"0 0 "+S+" "+S,style:{width:"100%",maxWidth:"310px"}},
+h("line",{x1:S/2,y1:10,x2:S/2,y2:S-20,stroke:"#B8C7D9"}),
+h("line",{x1:20,y1:(S-10)/2,x2:S-10,y2:(S-10)/2,stroke:"#B8C7D9"}),
+h("text",{x:S-10,y:(S-10)/2+14,textAnchor:"end",fontSize:9,fill:"#0C4F8E"},"Minat →"),
+h("text",{x:S/2+4,y:16,fontSize:9,fill:"#0C4F8E"},"↑ Kuasa"),
+props.data.map(function(st,i){var x=20+(Number(st.interest)/10)*(S-30);var y=(S-20)-(Number(st.power)/10)*(S-30);
+return h("g",{key:i},h("circle",{cx:x,cy:y,r:7,fill:col[st.stance],fillOpacity:.75}),
+h("text",{x:x+9,y:y+3,fontSize:8},(st.name||"").slice(0,14)));})),
+h("p",{className:"small"},"Hijau mendukung · biru netral · merah menolak."));}
+function CanvasMini(props){var data=props.data.filter(function(f){return f.factor.trim();});if(!data.length)return null;
+var W=Math.max(data.length*90,240),Hh=170,pad=30;
+function pts(key){return data.map(function(f,i){var x=pad+i*((W-pad*2)/Math.max(data.length-1,1));var y=Hh-pad-(Number(f[key])/10)*(Hh-pad*2);return x+","+y;}).join(" ");}
+return h("div",{style:{height:Hh+"px",overflowX:"auto",marginTop:"12px"}},
+h("svg",{viewBox:"0 0 "+W+" "+Hh,style:{width:"100%",height:"100%"}},
+h("polyline",{points:pts("industry"),fill:"none",stroke:"#B8C7D9",strokeWidth:2}),
+h("polyline",{points:pts("us"),fill:"none",stroke:"#15A89C",strokeWidth:3}),
+data.map(function(f,i){var x=pad+i*((W-pad*2)/Math.max(data.length-1,1));
+return h("g",{key:i},h("circle",{cx:x,cy:Hh-pad-(Number(f.us)/10)*(Hh-pad*2),r:4,fill:"#15A89C"}),
+h("circle",{cx:x,cy:Hh-pad-(Number(f.industry)/10)*(Hh-pad*2),r:3,fill:"#B8C7D9"}),
+h("text",{x:x,y:Hh-8,textAnchor:"middle",fontSize:8,fill:"#0C4F8E"},f.factor.slice(0,11)));}),
+h("text",{x:pad,y:14,fontSize:9,fill:"#15A89C"},"— Kami"),
+h("text",{x:pad+50,y:14,fontSize:9,fill:"#B8C7D9"},"— Industri")));}
+function House(props){var hh=props.h;
+function lines(arr,y0,fill){return arr.slice(0,3).map(function(b,i){return h("text",{key:i,x:200,y:y0+i*11,textAnchor:"middle",fill:fill,fontSize:8},(b||"").slice(0,58));});}
+return h("svg",{viewBox:"0 0 400 360",style:{width:"100%"}},
+h("polygon",{points:"200,8 392,92 8,92",fill:"#0C4F8E"}),
+h("text",{x:200,y:60,textAnchor:"middle",fill:"#fff",fontSize:11,fontWeight:700},(hh.vision||"Visi").slice(0,42)),
+h("rect",{x:8,y:98,width:384,height:58,fill:"#15A89C",rx:4}),
+h("text",{x:200,y:115,textAnchor:"middle",fill:"#fff",fontSize:9,fontWeight:700},"PERTEMPURAN KUNCI"),lines(hh.battles,129,"#fff"),
+h("rect",{x:8,y:162,width:384,height:58,fill:"#0F5FA8",rx:4}),
+h("text",{x:200,y:179,textAnchor:"middle",fill:"#fff",fontSize:9,fontWeight:700},"INISIATIF STRATEGIS"),lines(hh.initiatives,193,"#fff"),
+h("rect",{x:8,y:226,width:384,height:54,fill:"#6FA3D9",rx:4}),
+h("text",{x:200,y:243,textAnchor:"middle",fill:"#0C4F8E",fontSize:9,fontWeight:700},"ENABLER"),lines(hh.enablers,257,"#0C4F8E"),
+h("rect",{x:8,y:286,width:384,height:54,fill:"#F0A202",rx:4}),
+h("text",{x:200,y:303,textAnchor:"middle",fill:"#3a2c00",fontSize:9,fontWeight:700},"FONDASI"),lines(hh.foundation,317,"#3a2c00"));}
+
+function App(){
+var sd=useReducer(reducer,SEED);var state=sd[0],dispatch=sd[1];
+var st=useState(0),stage=st[0],setStage=st[1];
+var dr=useState(false),showDr=dr[0],setDr=dr[1];
+var vv=useState(null),valid=vv[0],setValid=vv[1];
+var issues=useMemo(function(){return critique(state);},[state]);
+var done=function(i){return !!(state.syntheses[i]||"").trim();};
+var doneCount=STAGES.filter(function(_,i){return done(i);}).length;
+var screens=[Stage0,Stage1,Stage2,Stage3,Stage4,Stage5];
+var errCount=issues.filter(function(i){return i.sev==="err";}).length;
+function imp(e){var f=e.target.files&&e.target.files[0];if(!f)return;var rd=new FileReader();
+rd.onload=function(){try{dispatch({type:"LOAD",payload:JSON.parse(rd.result)});setStage(0);}catch(_){alert("Bukan JSON proyek yang valid.");}};
+rd.readAsText(f);e.target.value="";}
+function runValid(){var gaps=critique(state).filter(function(i){return i.sev!=="info";});
+var missing=STAGES.map(function(sname,i){return done(i)?null:sname;}).filter(Boolean);setValid({gaps:gaps,missing:missing});}
+function loadScn(key){if(!key)return;if(confirm("Muat skenario ini? Pekerjaan yang belum diekspor akan hilang.")){dispatch({type:"LOAD",payload:structuredClone(SCENARIOS[key])});setStage(0);setValid(null);}}
+return h("div",{className:"app"},
+h("aside",{className:"rail"},
+h("div",{className:"railhead"},
+h("div",{className:"brandtag"},"DDK Training & Consulting"),
+h("h1",null,"Studio Perumusan Strategi Pro"),
+h("p",null,"Penalaran terpandu → strategi siap direksi")),
+h("nav",{style:{flex:1,padding:"8px 0"}},STAGES.map(function(label,i){
+return h("button",{key:i,className:"navbtn"+(stage===i?" active":""),onClick:function(){setStage(i);}},
+h("span",{className:"dot"+(done(i)?" done":"")},done(i)?"✓":i),h("span",null,label));})),
+h("div",{style:{padding:"12px",borderTop:"1px solid #B8C7D9",fontSize:"12px",color:"#1C6FB8"}},
+h("div",{style:{fontWeight:600,marginBottom:"4px",color:"#0C4F8E"}},SPINE[Math.min(stage,4)]),
+h("div",{style:{height:"6px",borderRadius:"999px",overflow:"hidden",background:"#B8C7D9"}},
+h("div",{style:{height:"100%",width:(doneCount/6*100)+"%",background:"#15A89C",transition:"width .3s"}})))),
+h("main",{className:"main"},
+h("div",{className:"topbar"},
+h("select",{onChange:function(e){loadScn(e.target.value);e.target.value="";},defaultValue:"",style:{width:"auto",fontWeight:600,color:"#0C4F8E"}},
+h("option",{value:"",disabled:true},"📚 Muat skenario industri…"),
+h("option",{value:"bank"},"🏦 Perbankan: Konvensional vs Digital"),
+h("option",{value:"mining"},"⛏️ Pertambangan: ESG & Energi Hijau"),
+h("option",{value:"auto"},"🚗 Otomotif: Tekanan EV"),
+h("option",{value:"health"},"🏥 Kesehatan: Presisi & Gaya Hidup")),
+btn("Mulai kosong",function(){if(confirm("Mulai kosong? Pekerjaan yang belum diekspor akan hilang.")){dispatch({type:"LOAD",payload:blank()});setStage(0);}},"ghost",true),
+h("label",{className:"btn ghost sm",style:{cursor:"pointer"}},"Impor JSON",h("input",{type:"file",accept:"application/json",style:{display:"none"},onChange:imp})),
+btn("Ekspor JSON",function(){download((state.meta.entity||"strategi")+".json",JSON.stringify(state,null,2),"application/json");},"ghost",true),
+h("div",{className:"flex1"}),
+btn("Tantang pemikiran saya"+(issues.length?" ("+issues.length+")":""),function(){setDr(!showDr);},"primary",true)),
+h("div",{className:"warnbar"},"⚠ Pekerjaan tersimpan di memori saja. Ekspor JSON untuk menyimpan sebelum menutup halaman."),
+h("div",{className:"content"},
+h("div",{className:"scroll"},
+screens[stage](state,dispatch),
+stage===5?card("Validasi Pra-Ekspor & Dokumen",null,[
+btn("Jalankan validasi pra-ekspor",runValid,"primary"),
+valid?h("div",{style:{marginTop:"12px",fontSize:"13px"}},
+(valid.missing.length===0&&valid.gaps.length===0)
+?h("p",{style:{color:"#1a7f4b"}},"✓ Semua sintesis terisi, tak ada celah kritis. Siap ekspor.")
+:h("div",null,
+valid.missing.length?h("p",{style:{color:"#b5651d"}},"Tahap tanpa sintesis: "+valid.missing.join(", ")):null,
+valid.gaps.length?h("ul",{style:{color:"#b00020",marginLeft:"18px"}},valid.gaps.map(function(g,i){return h("li",{key:i},g.text);})):null)):null,
+h("div",{style:{display:"flex",flexWrap:"wrap",gap:"8px",marginTop:"16px"}},
+btn("Ekspor Word (.doc)",function(){exportDocx(state);},"teal"),
+btn("Ekspor PDF",function(){exportPDF(state);},"amber"),
+btn("Ekspor JSON",function(){download((state.meta.entity||"strategi")+".json",JSON.stringify(state,null,2),"application/json");},"ghost")),
+h("p",{className:"small",style:{marginTop:"8px"}},"Word & PDF bergaya DDK. JSON = file simpan + jembatan ke deck pptxgenjs eksternal.")
+]):null),
+showDr?h("div",{className:"drawer"},
+h("h3",{style:{color:"#0C4F8E",margin:"0 0 4px"}},"Tantang pemikiran saya"),
+h("p",{className:"small",style:{marginBottom:"12px"}},"Pemeriksaan heuristik deterministik — bukan penilaian AI. Perbaiki yang teratas dulu."),
+errCount?h("div",{style:{fontSize:"11px",marginBottom:"8px",padding:"4px 8px",borderRadius:"4px",background:"#fff3f3",color:"#b00020"}},errCount+" isu kritis — perbaiki dulu."):null,
+issues.length===0
+?h("p",{style:{fontSize:"13px",color:"#1a7f4b"}},"Tidak ada isu terdeteksi. Itu bukan bukti strateginya benar.")
+:h("ul",{style:{listStyle:"none",padding:0,margin:0}},issues.map(function(it,i){
+return h("li",{key:i,className:"issue",style:{background:it.sev==="err"?"#fff3f3":it.sev==="warn"?"#fff8ec":"#F4F7FB"}},
+h("span",{style:{fontWeight:700,color:it.sev==="err"?"#b00020":it.sev==="warn"?"#b5651d":"#1C6FB8"}},(i<3&&it.sev!=="info")?"★":it.sev==="err"?"‼":it.sev==="warn"?"△":"i"),
+h("span",null,it.text));}))):null)));}
+
+ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+var l=document.getElementById("loading");if(l)l.style.display="none";
+})();
+</script>
+</body>
+</html>
